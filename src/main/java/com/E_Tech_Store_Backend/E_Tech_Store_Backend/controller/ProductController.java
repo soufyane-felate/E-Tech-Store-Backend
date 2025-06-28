@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("api/product")
+
 public class ProductController {
     private final ProductService productService;
 
@@ -20,11 +20,20 @@ public class ProductController {
     public ProductDto addProduct(@RequestBody ProductDto productDto){
         return productService.addProduct(productDto);
     }
-
-
     @GetMapping
-    public List <ProductDto> getAllProducts(){
-        return productService.getAllProducts();
+    public List<ProductDto>getAllProduct()
+    {
+        return productService.getAllProduct();
     }
+    @PutMapping("/{id}")
+    public ProductDto updateProduct(@PathVariable Long id,@RequestBody ProductDto productDto){
+        return productService.updateProduct(id, productDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Long id){
+         productService.deleteProduct(id);
+    }
+
 
 }
