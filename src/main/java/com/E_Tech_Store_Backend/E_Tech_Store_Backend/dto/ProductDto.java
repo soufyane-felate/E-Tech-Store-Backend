@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 public class ProductDto {
     private Long id;
-    private String name , description ;
+    private String name ,image, description ;
     private double price;
     private Categorie categorie;
     private ETAT etat;

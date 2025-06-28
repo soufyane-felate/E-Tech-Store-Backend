@@ -38,6 +38,7 @@ public class ProductService {
     {
         Product product = productRepository.findById(id).get();
         product.setName(productDto.getName());
+        product.setImage(productDto.getImage());
         product.setDescription(productDto.getDescription());
         product.setCategorie(productDto.getCategorie());
         product.setPrice(productDto.getPrice());
