@@ -1,8 +1,12 @@
 package com.E_Tech_Store_Backend.E_Tech_Store_Backend.controller;
 
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.ProductDto;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.enums.Categorie;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.enums.ETAT;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.service.FileStorageService;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.service.ProductService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,13 +17,28 @@ import java.util.List;
 
 public class ProductController {
     private final ProductService productService;
+    private final FileStorageService fileStorageService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, FileStorageService fileStorageService) {
         this.productService = productService;
+        this.fileStorageService = fileStorageService;
     }
 
     @PostMapping
-    public ProductDto addProduct(@RequestBody ProductDto productDto){
+    public ProductDto addProduct(@RequestParam("name") String name,
+                                 @RequestParam("description") String description,
+                                 @RequestParam("price") double price,
+                                 @RequestParam("categorie") Categorie categorie,
+                                 @RequestParam("etat") ETAT etat,
+                                 @RequestParam("image") MultipartFile image){
+        String imageName = fileStorageService.save(image);
+        ProductDto productDto = new ProductDto();
+        productDto.setName(name);
+        productDto.setDescription(description);
+        productDto.setPrice(price);
+        productDto.setCategorie(categorie);
+        productDto.setEtat(etat);
+        productDto.setImage(imageName);
         return productService.addProduct(productDto);
     }
     @GetMapping
