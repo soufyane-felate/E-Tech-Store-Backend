@@ -25,20 +25,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductDto addProduct(@RequestParam("name") String name,
-                                 @RequestParam("description") String description,
-                                 @RequestParam("price") double price,
-                                 @RequestParam("categorie") Categorie categorie,
-                                 @RequestParam("etat") ETAT etat,
-                                 @RequestParam("image") MultipartFile image){
-        String imageName = fileStorageService.save(image);
-        ProductDto productDto = new ProductDto();
-        productDto.setName(name);
-        productDto.setDescription(description);
-        productDto.setPrice(price);
-        productDto.setCategorie(categorie);
-        productDto.setEtat(etat);
-        productDto.setImage(imageName);
+    public ProductDto addProduct(@RequestBody ProductDto productDto){
         return productService.addProduct(productDto);
     }
     @GetMapping
