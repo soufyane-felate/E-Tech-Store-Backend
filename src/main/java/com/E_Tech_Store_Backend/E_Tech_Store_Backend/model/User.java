@@ -28,6 +28,9 @@ public class User implements UserDetails {
     private String email;
     private LocalDate registration_date;
     private Role role;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id", referencedColumnName = "id")
+    private Cart cart;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
