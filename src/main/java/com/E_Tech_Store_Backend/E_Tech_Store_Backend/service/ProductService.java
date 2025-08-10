@@ -33,6 +33,10 @@ public class ProductService {
                 .map(product -> productMapper.ToProductDto(product))
                 .toList();
     }
+//
+  public ProductDto getproductById(Long id){
+        return productMapper.ToProductDto(productRepository.findById(id).orElse(null));
+  }
 
     public ProductDto updateProduct(Long id , ProductDto productDto)
     {

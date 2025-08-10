@@ -3,6 +3,7 @@ package com.E_Tech_Store_Backend.E_Tech_Store_Backend.controller;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.ProductDto;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.enums.Categorie;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.enums.ETAT;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.Product;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.service.FileStorageService;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,12 @@ public class ProductController {
     public List<ProductDto>getAllProduct()
     {
         return productService.getAllProduct();
+    }
+
+    @GetMapping("/{id}")
+    public ProductDto getProductById(@PathVariable Long id){
+        return productService.getproductById(id);
+
     }
     @PutMapping("/{id}")
     public ProductDto updateProduct(@PathVariable Long id,@RequestBody ProductDto productDto){
