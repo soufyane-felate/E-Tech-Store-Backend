@@ -57,6 +57,13 @@ public class CartService {
     public Cart getCart(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return user.getCart();
+        Cart cart = user.getCart();
+        if (cart == null) {
+            cart = new Cart();
+            cartRepository.save(cart);
+            user.setCart(cart);
+            userRepository.save(user);
+        }
+        return cart;
     }
 }
