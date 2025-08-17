@@ -4,6 +4,7 @@ import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.AuthenticationRequest;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.AuthenticationResponse;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.RegisterRequest;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.Cart;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.UserProfile;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.repository.CartRepository;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.User;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.repository.UserRepository;
@@ -28,6 +29,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserProfileService userProfileService;
 
     public AuthenticationResponse register(RegisterRequest request) {
         Cart newCart = new Cart();
@@ -41,6 +43,11 @@ public class AuthenticationService {
                 .registration_date(LocalDate.now())
                 .build();
         var savedUser = repository.save(user);
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(savedUser);
+        userProfileService.createUserProfile(userProfile);
+
         var jwtToken = jwtService.generateToken(user);
         saveUserToken(savedUser, jwtToken);
         return AuthenticationResponse.builder()

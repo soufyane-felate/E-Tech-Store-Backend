@@ -34,10 +34,9 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/users/profile", "/api/v1/cart/**", "/api/product/all", "/api/product/{id}", "/api/product/by-category", "/api/orders/my-orders", "/api/orders/place", "/api/payments/create-payment-intent").permitAll()
+                        .requestMatchers("/api/product/add", "/api/product/update/**", "/api/product/delete/**", "/api/admin/**", "/api/orders/user/**", "/api/orders/status/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

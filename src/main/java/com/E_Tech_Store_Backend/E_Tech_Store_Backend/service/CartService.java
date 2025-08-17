@@ -66,4 +66,69 @@ public class CartService {
         }
         return cart;
     }
+
+    public void updateCartItemQuantity(String userEmail, Long productId, int quantityChange) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Cart cart = user.getCart();
+        if (cart == null) {
+            throw new RuntimeException("Cart not found for user");
+        }
+
+        CartItem targetItem = null;
+        for (CartItem item : cart.getItems()) {
+            if (item.getProduct().getId().equals(productId)) {
+                targetItem = item;
+                break;
+            }
+        }
+
+        if (targetItem == null) {
+            throw new RuntimeException("Product not found in cart");
+        }
+
+        int newQuantity = targetItem.getQuantity() + quantityChange;
+
+        if (newQuantity <= 0) {
+            cart.getItems().remove(targetItem);
+            cartItemRepository.delete(targetItem);
+        } else {
+            targetItem.setQuantity(newQuantity);
+            cartItemRepository.save(targetItem);
+        }
+        cartRepository.save(cart);
+    }
+    public void deleteCartById(Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
+
+        cart.getItems().clear();
+        cartRepository.save(cart);
+    }
+    public void deleteCartItem(String userEmail, Long productId) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Cart cart = user.getCart();
+        if (cart == null) {
+            throw new RuntimeException("Cart not found for user");
+        }
+
+        CartItem cartItemToRemove = null;
+        for (CartItem item : cart.getItems()) {
+            if (item.getProduct().getId().equals(productId)) {
+                cartItemToRemove = item;
+                break;
+            }
+        }
+
+        if (cartItemToRemove == null) {
+            throw new RuntimeException("Product not found in cart");
+        }
+
+        cart.getItems().remove(cartItemToRemove);
+        cartItemRepository.delete(cartItemToRemove);
+        cartRepository.save(cart);
+    }
 }
