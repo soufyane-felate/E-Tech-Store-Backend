@@ -7,5 +7,7 @@ import java.util.List;
 @Data
 public class CartDto {
     private Long id;
+    private String userEmail;
+    private double totalPrice;
     private List<CartItemDto> items;
 }

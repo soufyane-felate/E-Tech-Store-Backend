@@ -1,5 +1,6 @@
 package com.E_Tech_Store_Backend.E_Tech_Store_Backend.controller;
 
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.PlaceOrderRequest;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.Order;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.service.OrderService;
 import com.stripe.exception.StripeException;
@@ -19,10 +20,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/place")
-    public ResponseEntity<Order> placeOrder(Authentication authentication, @RequestBody Map<String, String> payload) throws StripeException {
+    public ResponseEntity<Order> placeOrder(Authentication authentication, @RequestBody PlaceOrderRequest request) throws StripeException {
         String userEmail = authentication.getName();
-        String paymentIntentId = payload.get("paymentIntentId");
-        Order order = orderService.placeOrder(userEmail, paymentIntentId);
+        Order order = orderService.placeOrder(userEmail, request.getPaymentIntentId(), request.getShippingAddress());
         return ResponseEntity.ok(order);
     }
 

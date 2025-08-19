@@ -20,6 +20,7 @@ public abstract class CartMapper {
         CartDto cartDto = new CartDto();
         cartDto.setId(cart.getId());
         cartDto.setItems(cartItemsToCartItemDtos(cart.getItems()));
+        cartDto.setTotalPrice(cart.calculateTotalPrice());
         return cartDto;
     }
 

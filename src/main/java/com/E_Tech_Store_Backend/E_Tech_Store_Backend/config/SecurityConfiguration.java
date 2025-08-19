@@ -18,6 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.service.LogoutService;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -34,7 +35,8 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/users/profile", "/api/v1/cart/**", "/api/product/all", "/api/product/{id}", "/api/product/by-category", "/api/orders/my-orders", "/api/orders/place", "/api/payments/create-payment-intent").permitAll()
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/users/profile", "/api/product/all", "/api/product/{id}", "/api/product/by-category", "/api/orders/my-orders", "/api/orders/place", "/api/payments/create-payment-intent").permitAll()
+                        .requestMatchers("/api/v1/cart/**").authenticated()
                         .requestMatchers("/api/product/add", "/api/product/update/**", "/api/product/delete/**", "/api/admin/**", "/api/orders/user/**", "/api/orders/status/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -53,7 +55,9 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+       configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:5200"));
+        //        configuration.setAllowedOrigins(Collections.singletonList("*"));
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

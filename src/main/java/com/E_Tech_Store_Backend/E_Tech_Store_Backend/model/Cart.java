@@ -1,7 +1,6 @@
 package com.E_Tech_Store_Backend.E_Tech_Store_Backend.model;
 
 import jakarta.persistence.*;
-import jdk.dynalink.linker.LinkerServices;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -16,4 +15,11 @@ public class Cart {
     private Long id;
     @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<CartItem>items=new ArrayList<>();
+
+    public double calculateTotalPrice() {
+        return items.stream()
+                .mapToDouble(item -> item.getProduct().getPrice() * item.getQuantity())
+                .sum();
+    }
 }
+

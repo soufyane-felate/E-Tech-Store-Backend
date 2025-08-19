@@ -24,10 +24,10 @@ public class OrderService {
     private final UserRepository userRepository;
     private final CartService cartService;
     private final UserProfileService userProfileService;
-    private final PaymentService paymentService; // Inject PaymentService
+    private final PaymentService paymentService;
 
     @Transactional
-    public Order placeOrder(String userEmail, String paymentIntentId) throws StripeException {
+    public Order placeOrder(String userEmail, String paymentIntentId, String shippingAddress) throws StripeException {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -41,23 +41,18 @@ public class OrderService {
             throw new RuntimeException("Cart is empty. Cannot place an order.");
         }
 
-        UserProfile userProfile = userProfileService.getUserProfileByUser(user);
-        if (userProfile == null || userProfile.getAddress() == null || userProfile.getAddress().isEmpty()) {
-            throw new RuntimeException("User profile address is missing. Please update your profile.");
-        }
-
         Order order = new Order();
         order.setUser(user);
         order.setOrderDate(LocalDate.now());
-        order.setStatus("PAID"); // Initial status
-        order.setShippingAddress(userProfile.getAddress() + ", " + userProfile.getCity() + ", " + userProfile.getState() + " " + userProfile.getZipCode() + ", " + userProfile.getCountry());
+        order.setStatus("PAID");
+        order.setShippingAddress(shippingAddress);
         order.setTotalAmount(paymentIntent.getAmount() / 100.0);
 
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(cartItem.getProduct().getPrice()); // Assuming Product has a getPrice() method
+            orderItem.setPrice(cartItem.getProduct().getPrice());
             orderItem.setOrder(order);
             return orderItem;
         }).collect(Collectors.toList());
@@ -66,7 +61,6 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
         orderItemRepository.saveAll(orderItems);
 
-        // Clear the cart after placing the order
         cartService.deleteCartById(cart.getId());
 
         return savedOrder;

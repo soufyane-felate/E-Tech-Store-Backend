@@ -64,41 +64,65 @@ public class CartService {
             user.setCart(cart);
             userRepository.save(user);
         }
+        cart.getItems().size();
         return cart;
     }
 
-    public void updateCartItemQuantity(String userEmail, Long productId, int quantityChange) {
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//    public void updateCartItemQuantity(String userEmail, Long productId, int newQuantity) {
+//        User user = userRepository.findByEmail(userEmail)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//
+//        Cart cart = user.getCart();
+//        if (cart == null) {
+//            throw new RuntimeException("Cart not found for user");
+//        }
+//
+//        CartItem targetItem = null;
+//        for (CartItem item : cart.getItems()) {
+//            if (item.getProduct().getId().equals(productId)) {
+//                targetItem = item;
+//                break;
+//            }
+//        }
+//
+//        if (targetItem == null) {
+//            throw new RuntimeException("Product not found in cart");
+//        }
+//
+//        if (newQuantity <= 0) {
+//            cart.getItems().remove(targetItem);
+//            cartItemRepository.delete(targetItem);
+//        } else {
+//            targetItem.setQuantity(newQuantity);
+//            cartItemRepository.save(targetItem);
+//        }
+//        cartRepository.save(cart);
+//    }
+public void updateCartItemQuantity(String userEmail, Long productId, int newQuantity) {
+    User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        Cart cart = user.getCart();
-        if (cart == null) {
-            throw new RuntimeException("Cart not found for user");
-        }
-
-        CartItem targetItem = null;
-        for (CartItem item : cart.getItems()) {
-            if (item.getProduct().getId().equals(productId)) {
-                targetItem = item;
-                break;
-            }
-        }
-
-        if (targetItem == null) {
-            throw new RuntimeException("Product not found in cart");
-        }
-
-        int newQuantity = targetItem.getQuantity() + quantityChange;
-
-        if (newQuantity <= 0) {
-            cart.getItems().remove(targetItem);
-            cartItemRepository.delete(targetItem);
-        } else {
-            targetItem.setQuantity(newQuantity);
-            cartItemRepository.save(targetItem);
-        }
-        cartRepository.save(cart);
+    Cart cart = user.getCart();
+    if (cart == null) {
+        throw new RuntimeException("Cart not found for user");
     }
+
+    CartItem targetItem = cart.getItems().stream()
+            .filter(item -> item.getProduct().getId().equals(productId))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Product not found in cart"));
+
+    if (newQuantity <= 0) {
+        cart.getItems().remove(targetItem);
+        cartItemRepository.delete(targetItem);
+    } else {
+        targetItem.setQuantity(newQuantity);
+        cartItemRepository.save(targetItem);
+    }
+
+    cartRepository.save(cart);
+}
+
     public void deleteCartById(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
