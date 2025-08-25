@@ -47,20 +47,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String userEmail = null;
         String newJwt = null;
 
+        System.out.println("Request URI: " + request.getRequestURI());
+        System.out.println("Authorization Header: " + authHeader);
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("No JWT token found in request headers");
             filterChain.doFilter(request, response);
             return;
         }
         jwt = authHeader.substring(7);
+        System.out.println("JWT: " + jwt);
 
         try {
             userEmail = jwtService.extractUsername(jwt);
+            System.out.println("User email extracted: " + userEmail);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            System.out.println("JWT token has expired");
             Optional<Token> storedToken = tokenRepository.findByToken(jwt);
             if (storedToken.isPresent() && !storedToken.get().isExpired() && !storedToken.get().isRevoked()) {
                 try {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(jwtService.extractUsername(jwt));
                     newJwt = jwtService.generateToken(userDetails);
+                    System.out.println("New JWT generated: " + newJwt);
 
                     storedToken.get().setExpired(true);
                     storedToken.get().setRevoked(true);
@@ -79,16 +87,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     request.setAttribute("newJwt", newJwt);
                     userEmail = jwtService.extractUsername(newJwt);
                 } catch (UsernameNotFoundException | io.jsonwebtoken.ExpiredJwtException refreshException) {
+                    System.out.println("Exception during token refresh: " + refreshException.getMessage());
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
                 }
             } else {
+                System.out.println("Expired token not found in repository or is revoked");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
         }
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            System.out.println("Security context is null, attempting to authenticate user");
             try {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                 String tokenToValidate = (newJwt != null) ? newJwt : jwt;
@@ -96,8 +107,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 var isTokenValid = tokenRepository.findByToken(tokenToValidate)
                         .map(t -> !t.isExpired() && !t.isRevoked())
                         .orElse(false);
+                System.out.println("Is token valid in repository? " + isTokenValid);
 
                 if (jwtService.isTokenValid(tokenToValidate, userDetails) && isTokenValid) {
+                    System.out.println("Token is valid, creating authentication token");
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -107,8 +120,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    System.out.println("Token is not valid");
                 }
             } catch (UsernameNotFoundException e) {
+                System.out.println("User not found: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
