@@ -3,6 +3,9 @@ package com.E_Tech_Store_Backend.E_Tech_Store_Backend.service;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.AuthenticationRequest;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.AuthenticationResponse;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.dto.RegisterRequest;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.Cart;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.UserProfile;
+import com.E_Tech_Store_Backend.E_Tech_Store_Backend.repository.CartRepository;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.model.User;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.repository.UserRepository;
 import com.E_Tech_Store_Backend.E_Tech_Store_Backend.token.Token;
@@ -21,20 +24,30 @@ import java.time.LocalDate;
 public class AuthenticationService {
 
     private final UserRepository repository;
+    private final CartRepository cartRepository;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserProfileService userProfileService;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        Cart newCart = new Cart();
+        cartRepository.save(newCart);
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .cart(newCart)
                 .registration_date(LocalDate.now())
                 .build();
         var savedUser = repository.save(user);
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(savedUser);
+        userProfileService.createUserProfile(userProfile);
+
         var jwtToken = jwtService.generateToken(user);
         saveUserToken(savedUser, jwtToken);
         return AuthenticationResponse.builder()
@@ -56,6 +69,7 @@ public class AuthenticationService {
         saveUserToken(user, jwtToken);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
+                .user(user)
                 .build();
     }
 

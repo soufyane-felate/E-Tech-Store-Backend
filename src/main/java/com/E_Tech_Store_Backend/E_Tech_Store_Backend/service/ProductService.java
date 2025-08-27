@@ -33,6 +33,10 @@ public class ProductService {
                 .map(product -> productMapper.ToProductDto(product))
                 .toList();
     }
+//
+  public ProductDto getproductById(Long id){
+        return productMapper.ToProductDto(productRepository.findById(id).orElse(null));
+  }
 
     public ProductDto updateProduct(Long id , ProductDto productDto)
     {
@@ -48,5 +52,13 @@ public class ProductService {
 
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
+    }
+
+    public long countProducts() {
+        return productRepository.count();
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 }
