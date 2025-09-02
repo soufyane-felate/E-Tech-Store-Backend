@@ -11,19 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderItem {
+public class RemovedProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @OneToOne
+    @JoinColumn(name = "product_id", referencedColumnName = "id")
     private Product product;
 
-    private int quantity;
-    private double price;
-
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    private String reason;
 }

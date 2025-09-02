@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "orders") // Renamed to avoid conflict with SQL 'ORDER' keyword
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class Order {
     private LocalDate orderDate;
     private double totalAmount;
     private String shippingAddress;
-    private String status; // e.g., PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    private String status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;

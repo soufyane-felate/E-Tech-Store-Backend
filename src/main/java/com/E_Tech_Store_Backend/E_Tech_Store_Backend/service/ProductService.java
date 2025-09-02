@@ -8,14 +8,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public class ProductService {
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
+    private final RemovedProductService removedProductService;
 
-    public ProductService(ProductMapper productMapper, ProductRepository productRepository) {
+    public ProductService(ProductMapper productMapper, ProductRepository productRepository, RemovedProductService removedProductService) {
         this.productMapper = productMapper;
         this.productRepository = productRepository;
+        this.removedProductService = removedProductService;
     }
 
     public ProductDto addProduct(ProductDto productDto){
@@ -50,6 +53,12 @@ public class ProductService {
         return productMapper.ToProductDto(productRepository.save(productMapper.ToProductEntity(productDto)));
     }
 
+    public void removeProduct(Long id, String reason) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        removedProductService.saveRemovedProduct(product, reason);
+        productRepository.deleteById(id);
+    }
+
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
@@ -61,4 +70,5 @@ public class ProductService {
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
+
 }
