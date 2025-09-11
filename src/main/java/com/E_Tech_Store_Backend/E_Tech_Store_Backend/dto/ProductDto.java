@@ -19,4 +19,6 @@ public class ProductDto {
     private Categorie categorie;
     private ETAT etat;
     private LocalDateTime publication_date;
+    private Long countClick = 0L;
+
 }

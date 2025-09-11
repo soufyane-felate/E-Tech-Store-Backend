@@ -25,6 +25,8 @@ public class Product {
     private double price;
     private Categorie categorie;
     private ETAT etat;
+    private long countClick=0;
+
 
     @CreationTimestamp
     @Column(name = "publication_date", nullable = false, updatable = false)

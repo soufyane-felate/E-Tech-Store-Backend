@@ -35,9 +35,30 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/users/profile", "/api/product/all", "/api/product/{id}", "/api/product/by-category", "/api/orders/my-orders", "/api/orders/place", "/api/payments/create-payment-intent").permitAll()
-                        .requestMatchers("/api/v1/cart/**").authenticated()
-                        .requestMatchers("/api/product/add", "/api/product/update/**", "/api/product/delete/**", "/api/admin/**", "/api/orders/user/**", "/api/orders/status/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/auth/**",
+						 "/v3/api-docs/**",
+						  "/swagger-ui/**",
+						   "/swagger-ui.html",
+						    "/api/v1/users/profile",
+							 "/api/product/all",
+							  "/api/product/{id}",
+							   "/api/product/by-category",
+							    "/api/orders/my-orders",
+								 "/api/orders/place",
+								  "/api/payments/create-payment-intent",
+                                    "/api/product/count/{id}"
+
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/v1/cart/**").authenticated()
+                        .requestMatchers(
+                                "/api/product/add",
+                                  "/api/product/update/**",
+                                    "/api/product/delete/**",
+                                      "/api/admin/**",
+                                        "/api/orders/user/**",
+                                          "/api/orders/status/**"
+                        ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

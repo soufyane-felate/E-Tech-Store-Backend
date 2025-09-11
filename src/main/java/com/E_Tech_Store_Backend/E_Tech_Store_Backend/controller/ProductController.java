@@ -50,5 +50,9 @@ public class ProductController {
          productService.deleteProduct(id);
     }
 
+     @GetMapping("/count/{id}")
+    public ProductDto incrementClick(@PathVariable Long id){
+        return productService.incrementClick(id);
+     }
 
 }

@@ -24,7 +24,7 @@ public class PaymentService {
         PaymentIntentCreateParams params =
                 PaymentIntentCreateParams.builder()
                         .setAmount((long) (amount * 100L))
-                        .setCurrency(currency)
+                        .setCurrency(currency) // MAD USD EURO
                         .build();
 
         return PaymentIntent.create(params);

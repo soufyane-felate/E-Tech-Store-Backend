@@ -52,23 +52,24 @@ public class ProductService {
         product.setEtat(productDto.getEtat());
         return productMapper.ToProductDto(productRepository.save(productMapper.ToProductEntity(productDto)));
     }
-
     public void removeProduct(Long id, String reason) {
         Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
         removedProductService.saveRemovedProduct(product, reason);
         productRepository.deleteById(id);
     }
-
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
-
     public long countProducts() {
         return productRepository.count();
     }
-
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
+    public ProductDto incrementClick(Long id) {
+         Product product=productRepository.findById(id).get();
+         product.setCountClick(product.getCountClick()+1);
+         return productMapper.ToProductDto(productRepository.save(product));
+    }
 }
